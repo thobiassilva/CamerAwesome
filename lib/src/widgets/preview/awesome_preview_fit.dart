@@ -146,26 +146,28 @@ class PreviewFitWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final transformController = TransformationController()
-      ..value = (Matrix4.identity()..scale(scale));
-
-    return Align(
-      alignment: alignment,
-      child: SizedBox(
-        height: previewSize.height * scale,
+    // Centers the scaled preview inside the available space using
+    // [alignment] on both axes (the original InteractiveViewer anchored the
+    // overflow at the top-left, so "cover" always cropped the right side).
+    return ClipRect(
+      child: OverflowBox(
+        key: previewWidgetKey,
+        alignment: alignment,
+        minWidth: 0,
+        minHeight: 0,
+        maxWidth: double.infinity,
+        maxHeight: double.infinity,
         child: Padding(
           padding: previewPadding ?? EdgeInsets.zero,
-          child: InteractiveViewer(
-            key: previewWidgetKey,
-            transformationController: transformController,
-            scaleEnabled: false,
-            constrained: false,
-            panEnabled: false,
-            clipBehavior: Clip.antiAlias,
-            child: SizedBox(
-              width: previewSize.width,
-              height: previewSize.height,
-              child: child,
+          child: SizedBox(
+            width: previewSize.width * scale,
+            height: previewSize.height * scale,
+            child: FittedBox(
+              child: SizedBox(
+                width: previewSize.width,
+                height: previewSize.height,
+                child: child,
+              ),
             ),
           ),
         ),
